@@ -1,0 +1,35 @@
+kind: Deployment # keeps tabs on pods and make sure all is well
+apiVersion: apps/v1 # which version of the API you are going to create
+metadata: # data to help you identify the object
+  name: deployment-demo
+spec: # here's what the deployment is going to create
+  replicas: 2 # spec.replica >> 2 replica pods
+  selector: # spec.selector >> how the deployment finds the pods to manage
+    matchLabels:
+      app: deployment-demo # simple way to select label, whcih is defined in pod template below
+  template: # defining the pod template to be used above
+    metadata: # label the pod here
+      labels:
+        app: deployment-demo # pods label that matchLabels above will use
+    spec: # what each pod will do
+      containers: # create a container
+        - name: deployment-demo # container named deployment-demo
+          image: ryanpedersen42/deployment-demo:latest # here's the container to use
+          imagePullPolicy: Always # [Optional // can also omit] Every time container is launched, kubelet queries registry.
+          ports:
+            - containerPort: 80 # port to expose (our image and nginx both use port 80)
+      restartPolicy: Always # This is default as well. What to do if theres an issue or crash.
+  
+--- 
+
+kind: Service # set of pods and how to access them
+apiVersion: v1 # set version 
+metadata: # data to help you identify the object
+  name: deployment-demo
+spec: # what it will create
+  type: LoadBalancer # spec.type >> provides external load balancer 
+  selector: # scans for pods that match this selector
+    app: deployment-demo 
+  ports:
+    - port: 80 # exposes service on this port
+      protocol: TCP # default protocol for Services
