@@ -4,11 +4,15 @@ orbs:
   helm: circleci/helm@1.2.0
   kubernetes: circleci/kubernetes@0.11.2
   terraform: circleci/terraform@2.0.1
-
+  node: circleci/node@4.7.0
+  
 workflows:
   BTD:
     jobs:
-      - build_docker
+      - test
+      - build_docker:
+          requires:
+            - test
       - deploy_linode:
           requires:
             - build_docker
