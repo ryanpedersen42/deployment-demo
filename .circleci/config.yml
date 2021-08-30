@@ -4,7 +4,6 @@ orbs:
   helm: circleci/helm@1.2.0
   kubernetes: circleci/kubernetes@0.11.2
   terraform: circleci/terraform@2.0.1
-	node: circleci/node@4.7.0
 
 workflows:
   BTD:
@@ -15,15 +14,14 @@ workflows:
             - build_docker
 
 jobs:
-	test:
-		executor: node
-		steps:
-			- checkout
+  test:
+    executor: node
+    steps:
+      - checkout
       - node/install-packages
       - run:
           command: npm run test  
-
-	build_docker: 
+  build_docker:
     executor: node
     steps:
       - checkout
@@ -54,7 +52,7 @@ jobs:
       - helm/install-helm-client:
           version: v3.0.0
       - helm/upgrade-helm-chart:
-          chart: ./helm-charts/react-app-chart
+          chart: ./helm-charts/react-app
           release-name: devops-demo
           no-output-timeout: 5m
           values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${DOCKER_REPOSITORY} 
@@ -63,6 +61,7 @@ jobs:
           command: |
             kubectl get services
             kubectl get pods
+
 executors:
   node:
     docker: 
