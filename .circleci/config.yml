@@ -1,0 +1,72 @@
+version: 2.1
+
+orbs:
+  helm: circleci/helm@1.2.0
+  kubernetes: circleci/kubernetes@0.11.2
+  terraform: circleci/terraform@2.0.1
+	node: circleci/node@4.7.0
+
+workflows:
+  BTD:
+    jobs:
+      - build_docker
+      - deploy_linode:
+          requires:
+            - build_docker
+
+jobs:
+	test:
+		executor: node
+		steps:
+			- checkout
+      - node/install-packages
+      - run:
+          command: npm run test  
+
+	build_docker: 
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: 
+          name: Build Docker image
+          command: |
+            docker build -f Dockerfile.prod -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+            docker push $DOCKER_REPOSITORY:$CIRCLE_SHA1
+  deploy_linode:
+    executor: python
+    steps:
+      - checkout
+      - run: 
+          name: Install JQ
+          command: |
+            if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+            $SUDO apt-get update && $SUDO apt-get install -y jq
+      - run:
+          name: Set up LKE kubeconfig
+          command: |
+            KUBE_VAR=$( curl -H "Authorization: Bearer $LINODE_TOKEN" https://api.linode.com/v4/lke/clusters/${LINODE_CLUSTER_ID}/kubeconfig | jq .kubeconfig )
+            lke_var="export KUBECONFIG_DATA=$KUBE_VAR"
+            echo $lke_var >> $BASH_ENV
+      - kubernetes/install-kubectl
+      - kubernetes/install-kubeconfig
+      - helm/install-helm-client:
+          version: v3.0.0
+      - helm/upgrade-helm-chart:
+          chart: ./helm-charts/react-app-chart
+          release-name: devops-demo
+          no-output-timeout: 5m
+          values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${DOCKER_REPOSITORY} 
+      - run: 
+          name: Test kubectl
+          command: |
+            kubectl get services
+            kubectl get pods
+executors:
+  node:
+    docker: 
+      - image: cimg/node:14.0.0
+  python:
+    docker:
+      - image: cimg/python:3.9.5
