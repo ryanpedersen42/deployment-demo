@@ -5,7 +5,7 @@ orbs:
   kubernetes: circleci/kubernetes@0.11.2
   terraform: circleci/terraform@2.0.1
   node: circleci/node@4.7.0
-  
+
 workflows:
   BTD:
     jobs:
@@ -33,7 +33,7 @@ jobs:
       - run: 
           name: Build Docker image
           command: |
-            docker build -f Dockerfile.prod -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
+            docker build -f Dockerfile -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
             docker push $DOCKER_REPOSITORY:$CIRCLE_SHA1
   deploy_linode:
