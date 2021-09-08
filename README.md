@@ -2,7 +2,7 @@
 
 **Youtube** 
 
-To go along with (this video)[https://youtu.be/flrEc9FxKNQ]
+To go along with [this video](https://youtu.be/flrEc9FxKNQ)
 
 **Running locally**
 
