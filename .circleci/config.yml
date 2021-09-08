@@ -33,7 +33,7 @@ jobs:
       - run: 
           name: Build Docker image
           command: |
-            docker build -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
+            docker build -f Dockerfile -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
             docker push $DOCKER_REPOSITORY:$CIRCLE_SHA1
   deploy_linode:
@@ -57,7 +57,7 @@ jobs:
           version: v3.0.0
       - helm/upgrade-helm-chart:
           chart: ./helm-charts/react-app
-          release-name: deployment-demo
+          release-name: devops-demo
           no-output-timeout: 5m
           values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${DOCKER_REPOSITORY} 
       - run: 
