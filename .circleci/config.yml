@@ -55,7 +55,7 @@ jobs:
       - kubernetes/install-kubeconfig
       - helm/install-helm-client:
           version: v3.0.0
-      - helm/install-helm-chart:
+      - helm/upgrade-helm-chart:
           chart: ./helm-charts/react-app
           release-name: deployment-demo
           no-output-timeout: 5m
