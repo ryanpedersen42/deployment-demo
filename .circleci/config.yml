@@ -40,19 +40,16 @@ jobs:
     executor: python
     steps:
       - checkout
-      - run: 
-          name: Install JQ
-          command: |
-            if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-            $SUDO apt-get update && $SUDO apt-get install -y jq
+      - kubernetes/install-kubectl
       - run:
           name: Set up LKE kubeconfig
           command: |
-            KUBE_VAR=$( curl -H "Authorization: Bearer $LINODE_TOKEN" https://api.linode.com/v4/lke/clusters/${LINODE_CLUSTER_ID}/kubeconfig | jq .kubeconfig )
-            lke_var="export KUBECONFIG_DATA=$KUBE_VAR"
-            echo $lke_var >> $BASH_ENV
-      - kubernetes/install-kubectl
-      - kubernetes/install-kubeconfig
+            export DECODED_TOKEN=$(echo ${TOKEN} | base64 -d)
+            echo $CA_CERT | base64 -d > ca.crt
+            kubectl config set-cluster sa-demo --server=${SERVER_ENDPOINT} --certificate-authority=ca.crt
+            kubectl config set-credentials sa-demo --token=${DECODED_TOKEN}
+            kubectl config set-context cci --user=sa-demo --cluster=sa-demo
+            kubectl config use-context cci
       - helm/install-helm-client:
           version: v3.0.0
       - helm/upgrade-helm-chart:
