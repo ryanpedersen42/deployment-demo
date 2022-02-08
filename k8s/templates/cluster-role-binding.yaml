@@ -1,12 +1,12 @@
-apiVersion: rbac.authorization.k8s.io/v1 # make sure it's not beta post v1.22
+apiVersion: rbac.authorization.k8s.io/v1 # make sure it's not beta for k8s post v1.22
 kind: ClusterRoleBinding #binding role
 metadata:
-  name: ci-kubernetes-sa 
-roleRef:
+  name: ci-kubernetes-sa # name for this ClusterRole
+roleRef: # specifiees binding to a Role or ClusterRole
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin #permissions to give it
-subjects:
+  kind: ClusterRole 
+  name: cluster-admin # permissions to give it
+subjects: # there can be more than one subject, but in this case we just need one
 - kind: ServiceAccount
-  name: sa-demo # name of SA
+  name: sa-demo # name of SA (case-sensitive)
   namespace: default # need namespace, default is.. default
