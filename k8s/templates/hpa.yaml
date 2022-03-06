@@ -1,0 +1,18 @@
+apiVersion: autoscaling/v2 # version of the API we are using
+kind: HorizontalPodAutoscaler # Horizontal scaling
+metadata:
+  name: deployment-demo # data to help you identify the object
+spec: # Describes the desired functionality of the HPA
+  scaleTargetRef: # what it will scale based on (target)
+    apiVersion: apps/v1 # version
+    kind: Deployment # specify what we are scaling based on -- Deployment or StatefulSet are examples
+    name: deployment-demo # name of Deployment
+  minReplicas: 1 # setting guardrails.. minimum replicas HPA can scale to
+  maxReplicas: 10 # setting guardrails.. maximum replicas HPA can scale to
+  metrics: # metrics we'll scale on
+  - type: Resource # setting type per docs
+    resource: # defining the resource
+      name: cpu # scale based on CPU
+      target: # target value of specified metric (CPU)
+        type: Utilization # Utilization, Value, or Average Value
+        averageUtilization: 50 # Average of the resource metric across relevant pods

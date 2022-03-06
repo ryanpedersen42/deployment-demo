@@ -1,0 +1,29 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2 # changed to v2 api version
+kind: HorizontalPodAutoscaler # HPA
+metadata: # defining metadata here
+  name: {{ include "hpa-video.fullname" . }}
+spec: # Describes the desired functionality of the HPA
+  scaleTargetRef: # what it will scale based on (target)
+    apiVersion: apps/v1 # version
+    kind: Deployment # specify what we are scaling based on -- Deployment or StatefulSet are examples
+    name: {{ include "hpa-video.fullname" . }} # will be using the name of the chart for this
+  minReplicas: {{ .Values.autoscaling.minReplicas }} # minimum guardrail
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }} # max guardrail
+  metrics: # metrics to scale on
+    {{- if .Values.autoscaling.targetCPUUtilizationPercentage }} # this value name is dated in this API version, but still using it for convenience
+  - type: Resource # setting type
+    resource: # define the resource
+      name: cpu # scale based on CPU
+      target: # target CPU
+        type: Utilization # CPU utilization
+        averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }} # define utilization target.. also dated variable name, but keeping for ease
+    {{- end }}
+    # not using memory in this demo, but easy to add and customize
+    # {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     targetAverageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    # {{- end }}
+{{- end }}
