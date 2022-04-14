@@ -1,0 +1,32 @@
+kind: Deployment # keeps tabs on pods and make sure all is well
+apiVersion: apps/v1 # which version of the API you are going to create
+metadata: # data to help you identify the object
+  name: deployment-demo-stable # canary deployment name
+  labels:
+    app: deployment-demo # additional metadata
+    # version: 1.0.0 # concept of version could be important for your CD tools. incremented from the stable
+spec: # here's what the deployment is going to create
+  replicas: 3 # spec.replica >> 1 replica canary pod
+  selector: # spec.selector >> how the deployment finds the pods to manage
+    matchLabels:
+      app: deployment-demo # simple way to select label, whcih is defined in pod template below
+      track: stable # best practice to include track
+  template: # defining the pod template to be used above
+    metadata: # label the pod here
+      labels:
+        app: deployment-demo # pods label that matchLabels above will use
+        track: stable # best practice to include track
+        # version: 1.0.0 # concept of version could be important for your CD tools. incremented from the stable
+    spec: # what each pod will do
+      containers: # create a container
+        - name: deployment-demo-stable # container named deployment-demo
+          image: ryanpedersen42/deployment-demo:stable # container with a stable tag
+          imagePullPolicy: Always # [Optional // can also omit] Every time container is launched, kubelet queries registry.
+          ports:
+            - containerPort: 80 # port to expose (our image and nginx both use port 80)
+          resources: # defining the resources of the container
+            limits: # resource limits for the container
+              cpu: 500m # specifying CPU
+            requests: # what will the container request
+              cpu: 200m # define how much the container will request
+      restartPolicy: Always # This is default as well. What to do if theres an issue or crash.

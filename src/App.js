@@ -7,7 +7,7 @@ function App() {
       <header className="App-header">
         <img src={pups} className="image" alt="logo" />
         <p>
-        👋 Welcome to our page 👋
+        👋 Welcome to our canary🐦 page 👋
         </p>
       </header>
     </div>
