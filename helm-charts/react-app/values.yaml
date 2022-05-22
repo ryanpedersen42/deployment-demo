@@ -8,7 +8,7 @@ image:
   repository: ryanpedersen42/deployment-demo
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: latest
+  tag: v1 # Change this to v2 for next version
 
 name: deployment-demo
 
