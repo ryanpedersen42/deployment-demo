@@ -1,0 +1,14 @@
+kind: Service # set of pods and how to access them
+apiVersion: v1 # set version 
+metadata: # data to help you identify the object
+  name: deployment-demo-green # green deployment 
+spec: # what it will create
+  type: LoadBalancer # spec.type >> provides external load balancer 
+  selector: # scans for deployments that match this selector
+    app: deployment-demo-green
+    deployment: green
+    version: 1.0.1 # incremented version
+  ports:
+    - port: 8080 # exposes service on this port! using 8080 but can be whichever you'd prefer (i.e. 9001, etc.)
+      targetPort: 80 # port being used
+      protocol: TCP # default protocol for Services

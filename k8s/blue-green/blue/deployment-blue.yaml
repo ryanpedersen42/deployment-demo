@@ -1,0 +1,34 @@
+kind: Deployment # keeps tabs on pods and make sure all is well
+apiVersion: apps/v1 # which version of the API you are going to create
+metadata: # data to help you identify the object
+  name: deployment-demo # deployment name
+  labels:
+    app: deployment-demo # additional metadata
+    deployment: blue # specify this is blue. in reality, it doesn't need to be deployment: demo and can be any key/value
+    version: 1.0.0 # concept of version could be important for your CD tools. 
+spec: # here's what the deployment is going to create
+  replicas: 1 # spec.replica >> 1 replica 
+  selector: # spec.selector >> how the deployment finds the pods to manage
+    matchLabels:
+      app: deployment-demo # simple way to select label, which is defined in pod template below
+      deployment: blue # including blue key/value
+      version: 1.0.0 # version (optional)
+  template: # defining the pod template to be used above
+    metadata: # label the pod here
+      labels:
+        app: deployment-demo # pods label that matchLabels above will use
+        deployment: blue # including blue key/value
+        version: 1.0.0 # version (optional)
+    spec: # what each pod will do
+      containers: # create a container
+        - name: deployment-demo # container named deployment-demo
+          image: ryanpedersen42/deployment-demo:blue # container with a blue tag
+          imagePullPolicy: Always # [Optional // can also omit] Every time container is launched, kubelet queries registry.
+          ports:
+            - containerPort: 80 # port to expose (our image and nginx both use port 80)
+          resources: # defining the resources of the container
+            limits: # resource limits for the container
+              cpu: 500m # specifying CPU
+            requests: # what will the container request
+              cpu: 200m # define how much the container will request
+      restartPolicy: Always # This is default as well. What to do if theres an issue or crash.

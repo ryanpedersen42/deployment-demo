@@ -1,0 +1,28 @@
+kind: Service # set of pods and how to access them
+apiVersion: v1 # set version 
+metadata: # data to help you identify the object
+  name: deployment-demo # this doens't change as it's used to specify what this deployment is w/ metadata
+spec: # what it will create
+  type: LoadBalancer # spec.type >> provides external load balancer 
+  selector: # scans for deployments that match this selector (this is the green!)
+    app: deployment-demo-green # this is the updated deployment to use
+    deployment: green # green is the new blue
+    version: 1.0.1 # new version
+  ports:
+    - port: 80 # exposes service on this port
+      protocol: TCP # default protocol for Services
+
+# INITIAL SERVICE FOR BLUE #
+# kind: Service # set of pods and how to access them
+# apiVersion: v1 # set version 
+# metadata: # data to help you identify the object
+#   name: deployment-demo
+# spec: # what it will create
+#   type: LoadBalancer # spec.type >> provides external load balancer 
+#   selector: # scans for deployments that match this selector
+#     app: deployment-demo 
+#     deployment: blue
+#     version: 1.0.0
+#   ports:
+#     - port: 80 # exposes service on this port
+#       protocol: TCP # default protocol for Services
